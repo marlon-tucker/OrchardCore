@@ -6,7 +6,7 @@
 @inject IContentManager ContentManager
 @inject OrchardCore.ContentManagement.Metadata.IContentDefinitionManager ContentDefinitionManager
 @inject OrchardCore.ContentManagement.Display.IContentItemDisplayManager ContentItemDisplayManager
-@inject OrchardCore.Modules.IHttpContextFlags HttpContextFlagsSvc
+@inject OrchardCore.Modules.IHttpContextFlags HttpContextFlags
 
 @{
     var widgetTemplatePlaceholderId = Html.Id("widgetTemplatePlaceholder");
@@ -71,7 +71,7 @@
 
 
     @* Render a mock widget so that its resources are included in the page *@
-    @using (HttpContextFlagsSvc.Using(HttpContextFlags.RenderingMockContentItem))
+    @using (HttpContextFlags.Using(OrchardCore.ContentManagement.Display.HttpContextFlags.RenderingMockContentItem))
     {
         @foreach (var type in Model.ContainedContentTypeDefinitions)
         {

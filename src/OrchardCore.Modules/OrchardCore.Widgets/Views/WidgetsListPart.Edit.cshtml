@@ -83,7 +83,7 @@
         <input type="hidden" id="buildEditorUrl" value="@Url.Action("BuildEditor", "Admin", new { area = "OrchardCore.Widgets" })" />
 
         // Render a mock widget so that its resources are included in the page
-        @using (HttpContextFlagsSvc.Using(HttpContextFlags.RenderingMockContentItem))
+        @using (HttpContextFlagsSvc.Using(OrchardCore.ContentManagement.Display.HttpContextFlags.RenderingMockContentItem))
         {
             @foreach (var type in widgetContentTypes)
             {                

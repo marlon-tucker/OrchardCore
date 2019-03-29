@@ -6,7 +6,7 @@
 @inject IContentManager ContentManager
 @inject OrchardCore.ContentManagement.Metadata.IContentDefinitionManager ContentDefinitionManager
 @inject OrchardCore.ContentManagement.Display.IContentItemDisplayManager ContentItemDisplayManager
-@inject OrchardCore.Modules.IHttpContextFlags HttpContextFlagsSvc
+@inject OrchardCore.Modules.IHttpContextFlags HttpContextFlags
 
 @{
     var widgetContentTypes = ContentDefinitionManager.ListTypeDefinitions().Where(t => t.Settings.ToObject<ContentTypeSettings>().Stereotype == "Widget");
@@ -66,7 +66,7 @@
         <input type="hidden" id="buildEditorUrl" value="@Url.Action("BuildEditor", "Admin", new { area = "OrchardCore.Flows" })" />
 
         // Render a mock widget so that its resources are included in the page
-        @using (HttpContextFlagsSvc.Using(HttpContextFlags.RenderingMockContentItem))
+        @using (HttpContextFlags.Using(OrchardCore.ContentManagement.Display.HttpContextFlags.RenderingMockContentItem))
         {
             @foreach (var type in widgetContentTypes)
             {                
