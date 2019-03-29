@@ -6,6 +6,7 @@
 @inject IContentManager ContentManager
 @inject OrchardCore.ContentManagement.Metadata.IContentDefinitionManager ContentDefinitionManager
 @inject OrchardCore.ContentManagement.Display.IContentItemDisplayManager ContentItemDisplayManager
+@inject OrchardCore.Modules.IHttpContextFlags HttpContextFlagsSvc
 
 @{
     var widgetTemplatePlaceholderId = Html.Id("widgetTemplatePlaceholder");
@@ -68,18 +69,23 @@
         <style asp-src="~/OrchardCore.Flows/Styles/flows.edit.css"></style>
     }
 
-    @* Rendered only once per type to initialize the scripts its editor will need *@
-    @foreach (var type in Model.ContainedContentTypeDefinitions)
-    {
-        @if (Context.Items["BagPart.Edit:" + type.Name] == null)
-        {
-            Context.Items["BagPart.Edit:" + type.Name] = new object();
 
-            // Render a mock widget so that its resources are included in the page
-            var contentItem = await ContentManager.NewAsync(type.Name);
-            await DisplayAsync(await ContentItemDisplayManager.BuildEditorAsync(contentItem, Model.Updater, true, "", Guid.NewGuid().ToString("n")));
+    @* Render a mock widget so that its resources are included in the page *@
+    @using (HttpContextFlagsSvc.Using(HttpContextFlags.RenderingMockContentItem))
+    {
+        @foreach (var type in Model.ContainedContentTypeDefinitions)
+        {
+            @* Rendered only once per type to initialize the scripts its editor will need *@
+            @if (Context.Items["BagPart.Edit:" + type.Name] == null)
+            {
+                Context.Items["BagPart.Edit:" + type.Name] = new object();
+
+                var contentItem = await ContentManager.NewAsync(type.Name);
+                await DisplayAsync(await ContentItemDisplayManager.BuildEditorAsync(contentItem, Model.Updater, true, "", Guid.NewGuid().ToString("n")));
+            }
         }
     }
+
 
     <script at="Foot">
         $("#@widgetTemplatePlaceholderId").sortable({

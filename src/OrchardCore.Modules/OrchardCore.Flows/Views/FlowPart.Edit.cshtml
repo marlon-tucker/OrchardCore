@@ -6,6 +6,7 @@
 @inject IContentManager ContentManager
 @inject OrchardCore.ContentManagement.Metadata.IContentDefinitionManager ContentDefinitionManager
 @inject OrchardCore.ContentManagement.Display.IContentItemDisplayManager ContentItemDisplayManager
+@inject OrchardCore.Modules.IHttpContextFlags HttpContextFlagsSvc
 
 @{
     var widgetContentTypes = ContentDefinitionManager.ListTypeDefinitions().Where(t => t.Settings.ToObject<ContentTypeSettings>().Stereotype == "Widget");
@@ -64,11 +65,15 @@
         Context.Items["FlowPart.Edit"] = new object();
         <input type="hidden" id="buildEditorUrl" value="@Url.Action("BuildEditor", "Admin", new { area = "OrchardCore.Flows" })" />
 
-        @foreach (var type in widgetContentTypes)
+        // Render a mock widget so that its resources are included in the page
+        @using (HttpContextFlagsSvc.Using(HttpContextFlags.RenderingMockContentItem))
         {
-            // Render a mock widget so that its resources are included in the page
-            var contentItem = await ContentManager.NewAsync(type.Name);
-            await DisplayAsync(await ContentItemDisplayManager.BuildEditorAsync(contentItem, Model.Updater, true, "", Guid.NewGuid().ToString("n")));
+            @foreach (var type in widgetContentTypes)
+            {                
+                var contentItem = await ContentManager.NewAsync(type.Name);
+                await DisplayAsync(await ContentItemDisplayManager.BuildEditorAsync(contentItem, Model.Updater, true, "", Guid.NewGuid().ToString("n")));
+            }
+
         }
 
         <script asp-src="~/OrchardCore.Flows/Scripts/flows.edit.js" at="Foot" depends-on="admin"></script>
